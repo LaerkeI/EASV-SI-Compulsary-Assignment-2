@@ -1,0 +1,92 @@
+services:
+  rabbitmq:
+    container_name: "rabbitmq"
+    image: "rabbitmq:3-management"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"   # AMQP Port - For application connections
+      - "15672:15672" # For RabbitMQ Management UI
+    networks:
+          - twitter-network
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    restart: always
+
+  user-management-service:
+    container_name: "user-management-service"
+    build:
+      context: .
+      dockerfile: UserManagementService/Dockerfile
+    # ports:
+    #   - "5001:80"
+    networks:
+      - twitter-network
+    restart: always
+
+  post-management-service:
+    container_name: "post-management-service"
+    build:
+      context: .
+      dockerfile: PostManagementService/Dockerfile
+    # ports:
+    #   - "5002:80"
+    depends_on:
+      - rabbitmq
+    networks:
+      - twitter-network
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    restart: always
+
+  notification-service:
+    container_name: "notification-service"
+    build:
+      context: .
+      dockerfile: NotificationService/Dockerfile
+    # ports:
+    #   - "5003:80"
+    depends_on:
+      - rabbitmq
+    networks:
+      - twitter-network
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    restart: always
+
+  timeline-service:
+    container_name: "timeline-service"
+    build:
+      context: .
+      dockerfile: TimelineService/Dockerfile
+    #ports:
+    #  - "5004:80"
+    networks:
+      - twitter-network
+    restart: always
+
+  api-gateway:
+    container_name: "api-gateway"
+    build: 
+      context: .
+      dockerfile: ApiGateway/Dockerfile
+    ports:
+      - "5000:80"
+    depends_on:
+      - post-management-service
+      - timeline-service
+      - notification-service
+      - user-management-service
+    networks:
+      - twitter-network
+    restart: always
+
+networks:
+  twitter-network:
+    name: twitter-network
+    driver: bridge
+
+volumes:
+  rabbitmq_data:
+
