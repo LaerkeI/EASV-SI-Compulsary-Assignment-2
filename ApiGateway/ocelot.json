@@ -1,33 +1,8 @@
 {
   "Routes": [
     {
-      "DownstreamPathTemplate": "/secured-endpoint",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "api-gateway",
-          "Port": 80
-        }
-      ],
-      "UpstreamPathTemplate": "/secured-endpoint",
-      "UpstreamHttpMethod": [ "GET" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/generate-token",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "api-gateway",
-          "Port": 80
-        }
-      ],
-      "UpstreamPathTemplate": "/generate-token",
-      "UpstreamHttpMethod": [ "GET" ]
-    },
-    {
+      "UpstreamPathTemplate": "/api/users",
+      "UpstreamHttpMethod": [ "POST", "GET" ],
       "DownstreamPathTemplate": "/users",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -36,14 +11,17 @@
           "Port": 80
         }
       ],
-      "UpstreamPathTemplate": "/api/users",
-      "UpstreamHttpMethod": [ "POST", "GET" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      }
+        "AuthenticationOptions": {
+          "AuthenticationProviderKey": "Bearer",
+          "AllowedScopes": [
+            "/api/users.write",
+            "/api/users.read"
+          ]
+        }
     },
     {
+      "UpstreamPathTemplate": "/api/users/{id}",
+      "UpstreamHttpMethod": [ "GET" ],
       "DownstreamPathTemplate": "/users/{id}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -52,14 +30,16 @@
           "Port": 80
         }
       ],
-      "UpstreamPathTemplate": "/api/users/{id}",
-      "UpstreamHttpMethod": [ "GET" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      }
+        "AuthenticationOptions": {
+          "AuthenticationProviderKey": "Bearer",
+          "AllowedScopes": [
+            "/api/users/{id}.read"
+          ]
+        }
     },
     {
+      "UpstreamPathTemplate": "/api/users/{id}/follow/{followedId}",
+      "UpstreamHttpMethod": [ "POST" ],
       "DownstreamPathTemplate": "/users/{id}/follow/{followedId}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -68,14 +48,16 @@
           "Port": 80
         }
       ],
-      "UpstreamPathTemplate": "/api/users/{id}/follow/{followedId}",
-      "UpstreamHttpMethod": [ "POST" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      }
+        "AuthenticationOptions": {
+          "AuthenticationProviderKey": "Bearer",
+          "AllowedScopes": [
+            "/api/users/{id}/follow/{followedId}.write"
+          ]
+        }
     },
     {
+      "UpstreamPathTemplate": "/api/tweets",
+      "UpstreamHttpMethod": [ "POST" ],
       "DownstreamPathTemplate": "/tweets",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -84,14 +66,16 @@
           "Port": 80
         }
       ],
-      "UpstreamPathTemplate": "/api/tweets",
-      "UpstreamHttpMethod": [ "POST" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      }
+        "AuthenticationOptions": {
+          "AuthenticationProviderKey": "Bearer",
+          "AllowedScopes": [
+            "/api/tweets.write"
+          ]
+        }
     },
     {
+      "UpstreamPathTemplate": "/api/tweets/{id}/like",
+      "UpstreamHttpMethod": [ "POST" ],
       "DownstreamPathTemplate": "/tweets/{id}/like",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -100,14 +84,16 @@
           "Port": 80
         }
       ],
-      "UpstreamPathTemplate": "/api/tweets/{id}/like",
-      "UpstreamHttpMethod": [ "POST" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      }
+        "AuthenticationOptions": {
+          "AuthenticationProviderKey": "Bearer",
+          "AllowedScopes": [
+            "/api/tweets/{id}/like.write"
+          ]
+        }
     },
     {
+      "UpstreamPathTemplate": "/api/timeline/{userId}",
+      "UpstreamHttpMethod": [ "GET" ],
       "DownstreamPathTemplate": "/timeline/{userId}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -116,15 +102,24 @@
           "Port": 80
         }
       ],
-      "UpstreamPathTemplate": "/api/timeline/{userId}",
-      "UpstreamHttpMethod": [ "GET" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      }
+        "AuthenticationOptions": {
+          "AuthenticationProviderKey": "Bearer",
+          "AllowedScopes": [
+            "/api/timeline/{userId}.read"
+          ]
+        }
+    },
+    {
+      "UpstreamPathTemplate": "/api/login",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamPathTemplate": "/login",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "authentication-service",
+          "Port": 80
+        }
+      ]
     }
-  ],
-  "GlobalConfiguration": {
-    "BaseUrl": "http://api-gateway:80"
-  }
+  ]
 }

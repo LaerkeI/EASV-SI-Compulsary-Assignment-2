@@ -1,4 +1,31 @@
 services:
+  api-gateway:
+    container_name: "api-gateway"
+    build: 
+      context: .
+      dockerfile: ApiGateway/Dockerfile
+    ports:
+      - "5000:80"
+    networks:
+      - twitter-network
+    restart: always
+  
+  authentication-service:
+    container_name: "authentication-service"
+    build: 
+      context: .
+      dockerfile: AuthenticationService/Dockerfile
+    # ports:
+    #   - "5005:80"
+    depends_on:
+      - post-management-service
+      - timeline-service
+      - notification-service
+      - user-management-service
+    networks:
+      - twitter-network
+    restart: always
+  
   rabbitmq:
     container_name: "rabbitmq"
     image: "rabbitmq:3-management"
@@ -21,6 +48,8 @@ services:
       dockerfile: UserManagementService/Dockerfile
     # ports:
     #   - "5001:80"
+    depends_on:
+      - api-gateway
     networks:
       - twitter-network
     restart: always
@@ -33,6 +62,7 @@ services:
     # ports:
     #   - "5002:80"
     depends_on:
+      - api-gateway
       - rabbitmq
     networks:
       - twitter-network
@@ -48,6 +78,7 @@ services:
     # ports:
     #   - "5003:80"
     depends_on:
+      - api-gateway
       - rabbitmq
     networks:
       - twitter-network
@@ -60,27 +91,14 @@ services:
     build:
       context: .
       dockerfile: TimelineService/Dockerfile
-    #ports:
-    #  - "5004:80"
+    # ports:
+    #   - "5004:80"
+    depends_on:
+      - api-gateway
     networks:
       - twitter-network
     restart: always
 
-  api-gateway:
-    container_name: "api-gateway"
-    build: 
-      context: .
-      dockerfile: ApiGateway/Dockerfile
-    ports:
-      - "5000:80"
-    depends_on:
-      - post-management-service
-      - timeline-service
-      - notification-service
-      - user-management-service
-    networks:
-      - twitter-network
-    restart: always
 
 networks:
   twitter-network:
