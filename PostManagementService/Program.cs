@@ -11,6 +11,9 @@ namespace PostManagementService
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Register health check services
+            builder.Services.AddHealthChecks();
+
             // Add RabbitMQ bus to the services container
             builder.Services.AddSingleton<IBus>(_ =>
             {
@@ -53,6 +56,9 @@ namespace PostManagementService
 
                 return Results.Ok();
             });
+
+            // Map the health check endpoint
+            app.MapHealthChecks("/health");
 
             app.Run();
         }

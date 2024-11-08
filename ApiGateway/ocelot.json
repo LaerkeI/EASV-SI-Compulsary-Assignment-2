@@ -1,5 +1,12 @@
 {
   "Routes": [
+    //{
+    //  "UpstreamPathTemplate": "/health",
+    //  "UpstreamHttpMethod": [ "GET" ],
+    //  "DownstreamPathTemplate": "/health",
+    //  "DownstreamScheme": "http",
+    //  "DownstreamHostAndPorts": []
+    //},
     {
       "UpstreamPathTemplate": "/api/users",
       "UpstreamHttpMethod": [ "POST", "GET" ],
@@ -17,6 +24,17 @@
             "/api/users.write",
             "/api/users.read"
           ]
+        },
+        "RateLimitOptions": {
+          "EnableRateLimiting": true,
+          "Period": "1m",
+          "PeriodTimespan": 60,
+          "Limit": 50
+        },
+        "QoSOptions": {
+          "ExceptionsAllowedBeforeBreaking": 5,
+          "DurationOfBreak": 15000,
+          "TimeoutValue": 4000
         }
     },
     {
@@ -35,6 +53,17 @@
           "AllowedScopes": [
             "/api/users/{id}.read"
           ]
+        },
+        "RateLimitOptions": {
+          "EnableRateLimiting": true,
+          "Period": "1m",
+          "PeriodTimespan": 60,
+          "Limit": 50
+        },
+        "QoSOptions": {
+          "ExceptionsAllowedBeforeBreaking": 5,
+          "DurationOfBreak": 15000,
+          "TimeoutValue": 4000
         }
     },
     {
@@ -53,6 +82,17 @@
           "AllowedScopes": [
             "/api/users/{id}/follow/{followedId}.write"
           ]
+        },
+        "RateLimitOptions": {
+          "EnableRateLimiting": true,
+          "Period": "1m",
+          "PeriodTimespan": 60,
+          "Limit": 50
+        },
+        "QoSOptions": {
+          "ExceptionsAllowedBeforeBreaking": 5,
+          "DurationOfBreak": 15000,
+          "TimeoutValue": 4000
         }
     },
     {
@@ -71,6 +111,17 @@
           "AllowedScopes": [
             "/api/tweets.write"
           ]
+        },
+        "RateLimitOptions": {
+          "EnableRateLimiting": true,
+          "Period": "1m",
+          "PeriodTimespan": 60,
+          "Limit": 50
+        },
+        "QoSOptions": {
+          "ExceptionsAllowedBeforeBreaking": 5,
+          "DurationOfBreak": 15000,
+          "TimeoutValue": 4000
         }
     },
     {
@@ -89,6 +140,17 @@
           "AllowedScopes": [
             "/api/tweets/{id}/like.write"
           ]
+        },
+        "RateLimitOptions": {
+          "EnableRateLimiting": true,
+          "Period": "1m",
+          "PeriodTimespan": 60,
+          "Limit": 50
+        },
+        "QoSOptions": {
+          "ExceptionsAllowedBeforeBreaking": 5,
+          "DurationOfBreak": 15000,
+          "TimeoutValue": 4000
         }
     },
     {
@@ -107,6 +169,17 @@
           "AllowedScopes": [
             "/api/timeline/{userId}.read"
           ]
+        },
+        "RateLimitOptions": {
+          "EnableRateLimiting": true,
+          "Period": "1m",
+          "PeriodTimespan": 60,
+          "Limit": 50
+        },
+        "QoSOptions": {
+          "ExceptionsAllowedBeforeBreaking": 5,
+          "DurationOfBreak": 15000,
+          "TimeoutValue": 4000
         }
     },
     {
@@ -119,7 +192,18 @@
           "Host": "authentication-service",
           "Port": 80
         }
-      ]
+      ],
+      "RateLimitOptions": {
+        "EnableRateLimiting": true,
+        "Period": "1m",
+        "PeriodTimespan": 60,
+        "Limit": 20
+      },
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 2,
+        "DurationOfBreak": 20000,
+        "TimeoutValue": 3000
+      }
     }
   ]
 }

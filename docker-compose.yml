@@ -1,31 +1,4 @@
 services:
-  api-gateway:
-    container_name: "api-gateway"
-    build: 
-      context: .
-      dockerfile: ApiGateway/Dockerfile
-    ports:
-      - "5000:80"
-    networks:
-      - twitter-network
-    restart: always
-  
-  authentication-service:
-    container_name: "authentication-service"
-    build: 
-      context: .
-      dockerfile: AuthenticationService/Dockerfile
-    # ports:
-    #   - "5005:80"
-    depends_on:
-      - post-management-service
-      - timeline-service
-      - notification-service
-      - user-management-service
-    networks:
-      - twitter-network
-    restart: always
-  
   rabbitmq:
     container_name: "rabbitmq"
     image: "rabbitmq:3-management"
@@ -33,23 +6,46 @@ services:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
     ports:
-      - "5672:5672"   # AMQP Port - For application connections
-      - "15672:15672" # For RabbitMQ Management UI
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
     networks:
-          - twitter-network
+      - twitter-network
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     restart: always
 
+  authentication-service:
+    container_name: "authentication-service"
+    build: 
+      context: .
+      dockerfile: AuthenticationService/Dockerfile
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - twitter-network
+    restart: always
+  
   user-management-service:
     container_name: "user-management-service"
     build:
       context: .
       dockerfile: UserManagementService/Dockerfile
-    # ports:
-    #   - "5001:80"
-    depends_on:
-      - api-gateway
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     networks:
       - twitter-network
     restart: always
@@ -59,11 +55,17 @@ services:
     build:
       context: .
       dockerfile: PostManagementService/Dockerfile
-    # ports:
-    #   - "5002:80"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     depends_on:
-      - api-gateway
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
+      user-management-service:
+        condition: service_healthy
     networks:
       - twitter-network
     environment:
@@ -75,11 +77,17 @@ services:
     build:
       context: .
       dockerfile: NotificationService/Dockerfile
-    # ports:
-    #   - "5003:80"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     depends_on:
-      - api-gateway
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
+      post-management-service:
+        condition: service_healthy
     networks:
       - twitter-network
     environment:
@@ -91,14 +99,51 @@ services:
     build:
       context: .
       dockerfile: TimelineService/Dockerfile
-    # ports:
-    #   - "5004:80"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     depends_on:
-      - api-gateway
+      post-management-service:
+        condition: service_healthy
+      user-management-service:
+        condition: service_healthy
     networks:
       - twitter-network
     restart: always
 
+  api-gateway:
+    container_name: "api-gateway"
+    build: 
+      context: .
+      dockerfile: ApiGateway/Dockerfile
+    ports:
+      - "5000:80"
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 10s
+    depends_on:
+      authentication-service:
+        condition: service_healthy
+      user-management-service:
+        condition: service_healthy
+      post-management-service:
+        condition: service_healthy
+      timeline-service:
+        condition: service_healthy
+    # depends_on:
+    #   - authentication-service
+    #   - user-management-service
+    #   - post-management-service
+    #   - timeline-service
+    networks:
+      - twitter-network
+    restart: always
 
 networks:
   twitter-network:
@@ -107,4 +152,5 @@ networks:
 
 volumes:
   rabbitmq_data:
+
 

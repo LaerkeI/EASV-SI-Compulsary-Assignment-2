@@ -13,6 +13,9 @@ namespace AuthenticationService
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Register health check services
+            builder.Services.AddHealthChecks();
+
             builder.Services.AddAuthentication();
             builder.Services.AddAuthorization();
 
@@ -25,6 +28,9 @@ namespace AuthenticationService
                 var token = CreateToken();
                 return Results.Ok(token);
             });
+
+            // Map the health check endpoint
+            app.MapHealthChecks("/health");
 
             app.Run();
         }

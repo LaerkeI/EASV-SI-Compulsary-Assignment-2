@@ -3,6 +3,10 @@
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
+
+# Install curl in the base stage
+RUN apt-get update && apt-get install -y curl
+
 EXPOSE 80
 EXPOSE 443
 

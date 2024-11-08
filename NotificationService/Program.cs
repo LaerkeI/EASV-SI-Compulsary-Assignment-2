@@ -11,6 +11,9 @@ namespace NotificationService
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Register health check services
+            builder.Services.AddHealthChecks();
+
             // RabbitMQ setup
             var rabbitMqHost = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost";
             var bus = RabbitHutch.CreateBus($"host={rabbitMqHost};timeout=60");
@@ -22,6 +25,9 @@ namespace NotificationService
 
             // Subscribe to messages from PostManagement (tweets liked)
             Task.Run(() => SubscribeToMessages(bus));
+
+            // Map the health check endpoint
+            app.MapHealthChecks("/health");
 
             app.Run();
         }

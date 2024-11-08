@@ -5,6 +5,10 @@ namespace UserManagementService
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            // Register health check services
+            builder.Services.AddHealthChecks();
+
             var app = builder.Build();
 
             // In-memory data store
@@ -42,6 +46,9 @@ namespace UserManagementService
                 user.FollowedUsers.Add(followedId);
                 return Results.Ok();
             });
+
+            // Map the health check endpoint
+            app.MapHealthChecks("/health");
 
             app.Run();
         }
