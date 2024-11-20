@@ -22,36 +22,42 @@ jobs:
         dotnet-version: '7.0'
 
     # Restore dependencies for each service
-    - name: Restore dependencies for Authentication Service
+    - name: Restore dependencies for AuthenticationService
       run: dotnet restore "AuthenticationService/AuthenticationService.csproj"
 
-    - name: Restore dependencies for Notification Service
+    - name: Restore dependencies for NotificationService
       run: dotnet restore "NotificationService/NotificationService.csproj"
 
-    - name: Restore dependencies for Post Management Service
+    - name: Restore dependencies for PostManagementService
       run: dotnet restore "PostManagementService/PostManagementService.csproj"
 
-    - name: Restore dependencies for Timeline Service
+    - name: Restore dependencies for TimelineService
       run: dotnet restore "TimelineService/TimelineService.csproj"
 
-    - name: Restore dependencies for User Management Service
+    - name: Restore dependencies for UserManagementService
       run: dotnet restore "UserManagementService/UserManagementService.csproj"
 
+    - name: Restore dependencies for ApiGateway
+      run: dotnet restore "ApiGateway/ApiGateway.csproj"
+
     # Build each service
-    - name: Build Authentication Service
+    - name: Build AuthenticationService
       run: dotnet build "AuthenticationService/AuthenticationService.csproj" --no-restore
 
-    - name: Build Notification Service
+    - name: Build NotificationService
       run: dotnet build "NotificationService/NotificationService.csproj" --no-restore
 
-    - name: Build Post Management Service
+    - name: Build PostManagementService
       run: dotnet build "PostManagementService/PostManagementService.csproj" --no-restore
 
-    - name: Build Timeline Service
+    - name: Build TimelineService
       run: dotnet build "TimelineService/TimelineService.csproj" --no-restore
 
-    - name: Build User Management Service
+    - name: Build UserManagementService
       run: dotnet build "UserManagementService/UserManagementService.csproj" --no-restore
+
+    - name: Build ApiGateway
+      run: dotnet build "ApiGateway/ApiGateway.csproj" --no-restore
 
   dockerize:
     needs: build
@@ -68,38 +74,45 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    # Build Docker image for Authentication Service
-    - name: Build Docker image for Authentication Service
+    # Build Docker image for AuthenticationService
+    - name: Build Docker image for AuthenticationService
       run: docker build -t ${{ secrets.DOCKER_USERNAME }}/authentication-service:latest -f "AuthenticationService/Dockerfile" .
 
-    # Build Docker image for Notification Service
-    - name: Build Docker image for Notification Service
+    # Build Docker image for NotificationService
+    - name: Build Docker image for NotificationService
       run: docker build -t ${{ secrets.DOCKER_USERNAME }}/notification-service:latest -f "NotificationService/Dockerfile" .
 
-    # Build Docker image for Post Management Service
-    - name: Build Docker image for Post Management Service
+    # Build Docker image for PostManagementService
+    - name: Build Docker image for PostManagementService
       run: docker build -t ${{ secrets.DOCKER_USERNAME }}/post-management-service:latest -f "PostManagementService/Dockerfile" .
 
-    # Build Docker image for Timeline Service
-    - name: Build Docker image for Timeline Service
+    # Build Docker image for TimelineService
+    - name: Build Docker image for TimelineService
       run: docker build -t ${{ secrets.DOCKER_USERNAME }}/timeline-service:latest -f "TimelineService/Dockerfile" .
 
-    # Build Docker image for User Management Service
-    - name: Build Docker image for User Management Service
+    # Build Docker image for UserManagementService
+    - name: Build Docker image for UserManagementService
       run: docker build -t ${{ secrets.DOCKER_USERNAME }}/user-management-service:latest -f "UserManagementService/Dockerfile" .
+    
+    # Build Docker image for ApiGateway
+    - name: Build Docker image for ApiGateway
+      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/api-gateway:latest -f "ApiGateway/Dockerfile" .
 
     # Push Docker images for all services
-    - name: Push Docker image for Authentication Service
+    - name: Push Docker image for AuthenticationService
       run: docker push ${{ secrets.DOCKER_USERNAME }}/authentication-service:latest
 
-    - name: Push Docker image for Notification Service
+    - name: Push Docker image for NotificationService
       run: docker push ${{ secrets.DOCKER_USERNAME }}/notification-service:latest
 
-    - name: Push Docker image for Post Management Service
+    - name: Push Docker image for PostManagementService
       run: docker push ${{ secrets.DOCKER_USERNAME }}/post-management-service:latest
 
-    - name: Push Docker image for Timeline Service
+    - name: Push Docker image for TimelineService
       run: docker push ${{ secrets.DOCKER_USERNAME }}/timeline-service:latest
 
-    - name: Push Docker image for User Management Service
+    - name: Push Docker image for UserManagementService
       run: docker push ${{ secrets.DOCKER_USERNAME }}/user-management-service:latest
+
+    - name: Push Docker image for ApiGateway
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/api-gateway:latest
