@@ -70,19 +70,25 @@ is configured with Polly policies as well.
 **Setup: Kubernetes Dashboard**
 
 First apply the following YAML file to create the Kubernetes Dashboard:
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+
+```kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml```
 
 Create service account and grant privileges:
-kubectl create sa webadmin -n kubernetes-dashboard 
-kubectl create clusterrolebinding webadmin --clusterrole=cluster-admin --serviceaccount=kubernetes-dashboard:webadmin
+
+```kubectl create sa webadmin -n kubernetes-dashboard``` 
+
+```kubectl create clusterrolebinding webadmin --clusterrole=cluster-admin --serviceaccount=kubernetes-dashboard:webadmin```
 
 Get the token for the service account:
-kubectl create token webadmin -n kubernetes-dashboard
+
+```kubectl create token webadmin -n kubernetes-dashboard```
 
 Run the following command:
-kubectl proxy
+
+```kubectl proxy```
 
 Open the following URL in your browser:
+
 http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
 
 Use the token to login.
