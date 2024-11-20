@@ -28,7 +28,7 @@ In *ocelot.json*, QoSOptions are used for configuring circuit breakers and retri
 ```
 
 **ApiGateway Retry Logic, Circuit Breaker and Fallback Logic**
-In *Program.cs* ín ApiGateway, Polly is being added to handle transient failures with retry, circuit breaker, and fallback policies. 
+In *Program.cs* ï¿½n ApiGateway, Polly is being added to handle transient failures with retry, circuit breaker, and fallback policies. 
 And Ocelot is being configured to use the HttpClient "OcelotHttpClient" that has been configured with Polly policies.  
 ```
     builder.Services.AddHttpClient("OcelotHttpClient")
@@ -57,3 +57,35 @@ is configured with Polly policies as well.
         .AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromMilliseconds(500)))
         .AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
 ```
+
+## Week 46 - Kubernetes
+
+**Steps I have done to setup Kubernetes for the Twitter System:**
+
+- CI/CD pipeline in Github Actions that builds the projects and pushes them to Docker Hub
+- k8s.yml-files for each microservice including ApiGateway
+- ApiGateway service is exposed on port 80 and port-forwarded to localhost:5000 using ```kubectl port-forward service/api-gateway 5000:80.``` 
+  so requests from Postman can be sent to the same url as before setting up Kubernetes. 
+
+**Setup: Kubernetes Dashboard**
+
+First apply the following YAML file to create the Kubernetes Dashboard:
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+
+Create service account and grant privileges:
+kubectl create sa webadmin -n kubernetes-dashboard 
+kubectl create clusterrolebinding webadmin --clusterrole=cluster-admin --serviceaccount=kubernetes-dashboard:webadmin
+
+Get the token for the service account:
+kubectl create token webadmin -n kubernetes-dashboard
+
+Run the following command:
+kubectl proxy
+
+Open the following URL in your browser:
+http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+
+Use the token to login.
+
+
+

@@ -1,0 +1,35 @@
+﻿apiVersion: v1
+kind: Service
+metadata:
+  name: user-management-service
+  namespace: default
+spec:
+  type: NodePort
+  selector:
+    app: user-management-service
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30005
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-management-service
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: user-management-service
+  template:
+    metadata:
+      labels:
+        app: user-management-service
+    spec:
+      containers:
+        - name: user-management-service
+          image: laerkeimeland/user-management-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
