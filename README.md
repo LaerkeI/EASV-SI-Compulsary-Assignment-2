@@ -64,7 +64,7 @@ is configured with Polly policies as well.
 
 - CI/CD pipeline in Github Actions that builds the projects and pushes them to Docker Hub
 - k8s.yml-files for each microservice including ApiGateway
-- ApiGateway service is exposed on port 80 and port-forwarded to localhost:5000 using ```kubectl port-forward service/api-gateway 5000:80.``` 
+- ApiGateway service is exposed on port 80 and port-forwarded to localhost:5000 using ```kubectl port-forward service/api-gateway 5000:80``` 
   so requests from Postman can be sent to the same url as before setting up Kubernetes. 
 
 **Setup: Kubernetes Dashboard**
