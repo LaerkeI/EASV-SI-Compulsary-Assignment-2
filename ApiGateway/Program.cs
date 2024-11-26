@@ -16,8 +16,8 @@ namespace ApiGateway
 
             var builder = WebApplication.CreateBuilder(args);
 
-            //// Register health check services
-            //builder.Services.AddHealthChecks();
+            // Register health check services
+            builder.Services.AddHealthChecks();
 
             // Load Ocelot configuration from the ocelot.json file
             builder.Configuration.AddJsonFile("ocelot.json", false, false);
@@ -68,10 +68,10 @@ namespace ApiGateway
             
             // Add Ocelot to application
             app.UseOcelot().Wait();
-            
-            //// Map the health check endpoint
-            //app.MapHealthChecks("/health");
-          
+
+            // Map the health check endpoint
+            app.MapHealthChecks("/health");
+
             app.Run();
         }
     }
