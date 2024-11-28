@@ -6,8 +6,8 @@ services:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "5673:5672"
+      - "15673:15672"
     healthcheck:
       test: rabbitmq-diagnostics -q ping
       interval: 30s
@@ -46,6 +46,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
     networks:
       - twitter-network
     restart: always
@@ -138,12 +140,14 @@ services:
         condition: service_healthy
     networks:
       - twitter-network
+      - default # allows the host machine to access the api gateway
     restart: always
 
 networks:
   twitter-network:
     name: twitter-network
     driver: bridge
+    internal: true
 
 volumes:
   rabbitmq_data:
