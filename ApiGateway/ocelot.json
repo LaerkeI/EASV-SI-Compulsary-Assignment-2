@@ -18,24 +18,24 @@
           "Port": 80
         }
       ],
-        "AuthenticationOptions": {
-          "AuthenticationProviderKey": "Bearer",
-          "AllowedScopes": [
-            "/api/users.write",
-            "/api/users.read"
-          ]
-        },
-        "RateLimitOptions": {
-          "EnableRateLimiting": true,
-          "Period": "1m",
-          "PeriodTimespan": 60,
-          "Limit": 50
-        },
-        "QoSOptions": {
-          "ExceptionsAllowedBeforeBreaking": 5,
-          "DurationOfBreak": 15000,
-          "TimeoutValue": 4000
-        }
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": [
+          "/api/users.write",
+          "/api/users.read"
+        ]
+      },
+      "RateLimitOptions": {
+        "EnableRateLimiting": true,
+        "Period": "1m",
+        "PeriodTimespan": 60,
+        "Limit": 50
+      },
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 5,
+        "DurationOfBreak": 15000,
+        "TimeoutValue": 4000
+      }
     },
     {
       "UpstreamPathTemplate": "/api/users/{id}",
@@ -48,23 +48,23 @@
           "Port": 80
         }
       ],
-        "AuthenticationOptions": {
-          "AuthenticationProviderKey": "Bearer",
-          "AllowedScopes": [
-            "/api/users/{id}.read"
-          ]
-        },
-        "RateLimitOptions": {
-          "EnableRateLimiting": true,
-          "Period": "1m",
-          "PeriodTimespan": 60,
-          "Limit": 50
-        },
-        "QoSOptions": {
-          "ExceptionsAllowedBeforeBreaking": 5,
-          "DurationOfBreak": 15000,
-          "TimeoutValue": 4000
-        }
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": [
+          "/api/users/{id}.read"
+        ]
+      },
+      "RateLimitOptions": {
+        "EnableRateLimiting": true,
+        "Period": "1m",
+        "PeriodTimespan": 60,
+        "Limit": 50
+      },
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 5,
+        "DurationOfBreak": 15000,
+        "TimeoutValue": 4000
+      }
     },
     {
       "UpstreamPathTemplate": "/api/users/{id}/follow/{followedId}",
@@ -77,23 +77,52 @@
           "Port": 80
         }
       ],
-        "AuthenticationOptions": {
-          "AuthenticationProviderKey": "Bearer",
-          "AllowedScopes": [
-            "/api/users/{id}/follow/{followedId}.write"
-          ]
-        },
-        "RateLimitOptions": {
-          "EnableRateLimiting": true,
-          "Period": "1m",
-          "PeriodTimespan": 60,
-          "Limit": 50
-        },
-        "QoSOptions": {
-          "ExceptionsAllowedBeforeBreaking": 5,
-          "DurationOfBreak": 15000,
-          "TimeoutValue": 4000
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": [
+          "/api/users/{id}/follow/{followedId}.write"
+        ]
+      },
+      "RateLimitOptions": {
+        "EnableRateLimiting": true,
+        "Period": "1m",
+        "PeriodTimespan": 60,
+        "Limit": 50
+      },
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 5,
+        "DurationOfBreak": 15000,
+        "TimeoutValue": 4000
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/user-management-service/generate-token",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamPathTemplate": "/user-management-service/generate-token",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "user-management-service",
+          "Port": 80
         }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": [
+          "/api/user-management-service/generate-token.write"
+        ]
+      },
+      "RateLimitOptions": {
+        "EnableRateLimiting": true,
+        "Period": "1m",
+        "PeriodTimespan": 60,
+        "Limit": 50
+      },
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 5,
+        "DurationOfBreak": 15000,
+        "TimeoutValue": 4000
+      }
     },
     {
       "UpstreamPathTemplate": "/api/tweets",
@@ -106,23 +135,23 @@
           "Port": 80
         }
       ],
-        "AuthenticationOptions": {
-          "AuthenticationProviderKey": "Bearer",
-          "AllowedScopes": [
-            "/api/tweets.write"
-          ]
-        },
-        "RateLimitOptions": {
-          "EnableRateLimiting": true,
-          "Period": "1m",
-          "PeriodTimespan": 60,
-          "Limit": 50
-        },
-        "QoSOptions": {
-          "ExceptionsAllowedBeforeBreaking": 5,
-          "DurationOfBreak": 15000,
-          "TimeoutValue": 4000
-        }
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": [
+          "/api/tweets.write"
+        ]
+      },
+      "RateLimitOptions": {
+        "EnableRateLimiting": true,
+        "Period": "1m",
+        "PeriodTimespan": 60,
+        "Limit": 50
+      },
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 5,
+        "DurationOfBreak": 15000,
+        "TimeoutValue": 4000
+      }
     },
     {
       "UpstreamPathTemplate": "/api/tweets/{id}/like",
@@ -135,23 +164,23 @@
           "Port": 80
         }
       ],
-        "AuthenticationOptions": {
-          "AuthenticationProviderKey": "Bearer",
-          "AllowedScopes": [
-            "/api/tweets/{id}/like.write"
-          ]
-        },
-        "RateLimitOptions": {
-          "EnableRateLimiting": true,
-          "Period": "1m",
-          "PeriodTimespan": 60,
-          "Limit": 50
-        },
-        "QoSOptions": {
-          "ExceptionsAllowedBeforeBreaking": 5,
-          "DurationOfBreak": 15000,
-          "TimeoutValue": 4000
-        }
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": [
+          "/api/tweets/{id}/like.write"
+        ]
+      },
+      "RateLimitOptions": {
+        "EnableRateLimiting": true,
+        "Period": "1m",
+        "PeriodTimespan": 60,
+        "Limit": 50
+      },
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 5,
+        "DurationOfBreak": 15000,
+        "TimeoutValue": 4000
+      }
     },
     {
       "UpstreamPathTemplate": "/api/timeline/{userId}",
@@ -164,23 +193,23 @@
           "Port": 80
         }
       ],
-        "AuthenticationOptions": {
-          "AuthenticationProviderKey": "Bearer",
-          "AllowedScopes": [
-            "/api/timeline/{userId}.read"
-          ]
-        },
-        "RateLimitOptions": {
-          "EnableRateLimiting": true,
-          "Period": "1m",
-          "PeriodTimespan": 60,
-          "Limit": 50
-        },
-        "QoSOptions": {
-          "ExceptionsAllowedBeforeBreaking": 5,
-          "DurationOfBreak": 15000,
-          "TimeoutValue": 4000
-        }
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": [
+          "/api/timeline/{userId}.read"
+        ]
+      },
+      "RateLimitOptions": {
+        "EnableRateLimiting": true,
+        "Period": "1m",
+        "PeriodTimespan": 60,
+        "Limit": 50
+      },
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 5,
+        "DurationOfBreak": 15000,
+        "TimeoutValue": 4000
+      }
     },
     {
       "UpstreamPathTemplate": "/api/login",

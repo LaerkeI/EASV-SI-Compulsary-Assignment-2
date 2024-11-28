@@ -54,7 +54,8 @@ namespace AuthenticationService
                 new Claim("scope", "/api/users/{id}/follow/{followedId}.write"),
                 new Claim("scope", "/api/tweets.write"),
                 new Claim("scope", "/api/tweets/{id}/like.write"),
-                new Claim("scope", "/api/timeline/{userId}.read")
+                new Claim("scope", "/api/timeline/{userId}.read"),
+                new Claim("scope", "/api/user-management-service/generate-token.write")
             };
 
             var tokenOptions = new JwtSecurityToken(
