@@ -106,6 +106,8 @@ services:
         condition: service_healthy
       post-management-service:
         condition: service_healthy
+    volumes:
+      - ./logs/notification-service:/var/log/app
     networks:
       - twitter-network
     environment:
