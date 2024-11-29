@@ -95,3 +95,7 @@ Use the token to login.
 
 
 
+## Week 48 - Design Patterns
+
+I have decided to implement a sidecar pattern using Fluent Bit which is a fast, lightweight, and highly scalable logging, metrics, and traces processor and forwarder. 
+Logs from multiple microservices are collected and written to separate log files within a shared directory for a easy monitoring. The logs are parsed a JSON for a structured and easy analysis. 
