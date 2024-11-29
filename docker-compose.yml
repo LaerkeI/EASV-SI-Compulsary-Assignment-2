@@ -45,6 +45,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+    volumes:
+      - ./logs/authentication-service:/var/log/app
     networks:
       - twitter-network
     restart: always

@@ -6,68 +6,121 @@ namespace AuthenticationService
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.IdentityModel.Tokens;
     using Microsoft.AspNetCore.Builder;
+    using Serilog;
 
     public class Program
     {
         public static async Task Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            // Configure Serilog
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.Console()
+                .WriteTo.File("/var/log/app/authentication-service.log", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
 
-            // Register health check services
-            builder.Services.AddHealthChecks();
+            try
+            {
+                Log.Information("Starting AuthenticationService");
 
-            builder.Services.AddAuthentication();
-            builder.Services.AddAuthorization();
+                var builder = WebApplication.CreateBuilder(args);
 
-            var app = builder.Build();
+                // Add Serilog to the logging pipeline
+                builder.Host.UseSerilog();
 
-            app.UseAuthentication();
-            app.UseAuthorization();
+                // Register health check services
+                builder.Services.AddHealthChecks();
 
-            app.MapPost("/login", () => {
-                var token = CreateToken();
-                return Results.Ok(token);
-            });
+                builder.Services.AddAuthentication();
+                builder.Services.AddAuthorization();
 
-            // Map the health check endpoint
-            app.MapHealthChecks("/health");
+                var app = builder.Build();
 
-            app.Run();
+                app.UseAuthentication();
+                app.UseAuthorization();
+
+                app.MapPost("/login", () =>
+                {
+                    var logger = Log.ForContext("Endpoint", "/login");
+                    try
+                    {
+                        logger.Information("Login request received. Generating token...");
+
+                        var token = CreateToken();
+
+                        logger.Information("Token successfully generated");
+                        return Results.Ok(token);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error(ex, "An error occurred while generating the token");
+                        return Results.StatusCode(500);
+                    }
+                });
+
+                // Map the health check endpoint
+                app.MapHealthChecks("/health");
+
+                app.Run();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "AuthenticationService terminated unexpectedly");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
-        //Generate the token the user will use to sign in
+        // Generate the token the user will use to sign in
         public static AuthenticationToken CreateToken()
         {
-            //The secret key that is used to generate tokens
             const string SecurityKey = "MyClientSecretThatIsDefinitelyNotTooShort";
-            
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecurityKey));
-            var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
-            //Claims describe what a user is allowed and not allowed to do
-            var claims = new List<Claim>
+            var logger = Log.ForContext("Method", nameof(CreateToken));
+            try
             {
-                new Claim("scope", "/api/login.write"),
-                new Claim("scope", "/api/users.write"),
-                new Claim("scope", "/api/users/{id}.read"),
-                new Claim("scope", "/api/users/{id}/follow/{followedId}.write"),
-                new Claim("scope", "/api/tweets.write"),
-                new Claim("scope", "/api/tweets/{id}/like.write"),
-                new Claim("scope", "/api/timeline/{userId}.read"),
-                new Claim("scope", "/api/user-management-service/generate-token.write")
-            };
+                logger.Information("Starting token generation");
 
-            var tokenOptions = new JwtSecurityToken(
-                signingCredentials: signingCredentials, claims: claims
-            );
+                var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecurityKey));
+                var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions); 
-            var authToken = new AuthenticationToken
+                // Claims describe what a user is allowed and not allowed to do
+                var claims = new List<Claim>
+                {
+                    new Claim("scope", "/api/login.write"),
+                    new Claim("scope", "/api/users.write"),
+                    new Claim("scope", "/api/users/{id}.read"),
+                    new Claim("scope", "/api/users/{id}/follow/{followedId}.write"),
+                    new Claim("scope", "/api/tweets.write"),
+                    new Claim("scope", "/api/tweets/{id}/like.write"),
+                    new Claim("scope", "/api/timeline/{userId}.read"),
+                    new Claim("scope", "/api/user-management-service/generate-token.write")
+                };
+
+                logger.Information("Claims created: {ClaimCount}", claims.Count);
+
+                var tokenOptions = new JwtSecurityToken(
+                    signingCredentials: signingCredentials,
+                    claims: claims
+                );
+
+                var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
+                logger.Information("Token generation successful");
+
+                return new AuthenticationToken { Value = tokenString };
+            }
+            catch (Exception ex)
             {
-                Value = tokenString
-            };
-            
-            return authToken;
-        }   
+                logger.Error(ex, "Error occurred during token generation");
+                throw;
+            }
+        }
+
+        public class AuthenticationToken
+        {
+            public string Value { get; set; }
+        }
     }
 }
