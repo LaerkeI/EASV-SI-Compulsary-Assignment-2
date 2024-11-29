@@ -160,6 +160,8 @@ services:
         condition: service_healthy
       timeline-service:
         condition: service_healthy
+    volumes:
+      - ./logs/api-gateway:/var/log/app
     networks:
       - twitter-network
       - default # allows the host machine to access the api gateway
