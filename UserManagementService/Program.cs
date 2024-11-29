@@ -110,7 +110,7 @@ namespace UserManagementService
         }
         private static AuthenticationToken CreateToken()
         {
-            const string SecurityKey = "MyClientSecretThatIsDefinitelyNotTooShortUserManagementService";
+            const string SecurityKey = "MyClientSecretThatIsDefinitelyNotTooShort";
 
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecurityKey));
             var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
@@ -119,15 +119,16 @@ namespace UserManagementService
             var claims = new List<Claim>
             {
                 new Claim("scope", "/api/users.write"),
-                new Claim("scope", "/api/users.write"),
                 new Claim("scope", "/api/users/{id}.read"),
                 new Claim("scope", "/api/users/{id}/follow/{followedId}.write")
             };
 
             var tokenOptions = new JwtSecurityToken(
-                signingCredentials: signingCredentials,
+                "http://user-management-service",
+                "http://user-management-service",
                 claims: claims,
-                expires: DateTime.Now.AddHours(1)
+                expires: DateTime.Now.AddHours(1),
+                signingCredentials: signingCredentials
             );
 
             var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);

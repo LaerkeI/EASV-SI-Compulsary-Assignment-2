@@ -49,7 +49,6 @@ namespace AuthenticationService
             {
                 new Claim("scope", "/api/login.write"),
                 new Claim("scope", "/api/users.write"),
-                new Claim("scope", "/api/users.write"),
                 new Claim("scope", "/api/users/{id}.read"),
                 new Claim("scope", "/api/users/{id}/follow/{followedId}.write"),
                 new Claim("scope", "/api/tweets.write"),
