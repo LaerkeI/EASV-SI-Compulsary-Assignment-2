@@ -1,4 +1,18 @@
 services:
+  fluent-bit:
+    image: fluent/fluent-bit:latest
+    container_name: "fluent-bit"
+    volumes:
+      - ./logs:/var/log/app
+      - ./db:/fluent-bit/db # Persistent storage for Fluent Bit DB
+      - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
+    command: ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.conf"]
+    depends_on:
+      timeline-service:
+        condition: service_healthy
+    networks:
+      - twitter-network
+
   rabbitmq:
     container_name: "rabbitmq"
     image: "rabbitmq:3-management"
@@ -112,6 +126,8 @@ services:
         condition: service_healthy
       user-management-service:
         condition: service_healthy
+    volumes:
+      - ./logs/timeline-service:/var/log/app
     networks:
       - twitter-network
     restart: always
