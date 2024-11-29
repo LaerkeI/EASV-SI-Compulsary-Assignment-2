@@ -3,64 +3,103 @@ namespace PostManagementService
     using EasyNetQ;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Hosting;
+    using Serilog;
 
     public class Program
     {
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            // Configure Serilog
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.Console()
+                .WriteTo.File("/var/log/app/post-management-service.log", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
 
-            // Register health check services
-            builder.Services.AddHealthChecks();
-
-            // Add RabbitMQ bus to the services container
-            builder.Services.AddSingleton<IBus>(_ =>
+            try
             {
-                var rabbitMqHost = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost";
-                return RabbitHutch.CreateBus($"host={rabbitMqHost}");
-            });
+                Log.Information("Starting PostManagementService");
 
-            var app = builder.Build();
+                var builder = WebApplication.CreateBuilder(args);
 
-            // In-memory data store for tweets
-            var tweets = new List<Tweet>();
+                // Add Serilog to the logging pipeline
+                builder.Host.UseSerilog();
 
-            // Post a new tweet
-            app.MapPost("/tweets", (Tweet tweet) =>
+                // Register health check services
+                builder.Services.AddHealthChecks();
+
+                // Add RabbitMQ bus to the services container
+                builder.Services.AddSingleton<IBus>(_ =>
+                {
+                    var rabbitMqHost = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost";
+                    Log.Information("Configuring RabbitMQ with host: {RabbitMqHost}", rabbitMqHost);
+                    return RabbitHutch.CreateBus($"host={rabbitMqHost}");
+                });
+
+                var app = builder.Build();
+
+                // In-memory data store for tweets
+                var tweets = new List<Tweet>();
+
+                // Post a new tweet
+                app.MapPost("/tweets", (Tweet tweet) =>
+                {
+                    var logger = Log.ForContext("Endpoint", "/tweets");
+                    logger.Information("Received request to post a new tweet for UserId: {UserId}", tweet.UserId);
+
+                    tweets.Add(tweet);
+
+                    logger.Information("Tweet posted successfully. TweetId: {TweetId}", tweet.Id);
+                    return Results.Ok(tweet);
+                });
+
+                // Get tweets by userId
+                app.MapGet("/tweets", (int userId) =>
+                {
+                    var logger = Log.ForContext("Endpoint", "/tweets");
+                    logger.Information("Received request to get tweets for UserId: {UserId}", userId);
+
+                    var userTweets = tweets.Where(t => t.UserId == userId).ToList();
+
+                    logger.Information("Returning {TweetCount} tweets for UserId: {UserId}", userTweets.Count, userId);
+                    return Results.Ok(userTweets);
+                });
+
+                // Like a tweet (send RabbitMQ message to Notification Service)
+                app.MapPost("/tweets/{id}/like", async (int id, LikeRequest request, IBus bus) =>
+                {
+                    var logger = Log.ForContext("Endpoint", "/tweets/{id}/like");
+                    logger.Information("Received request to like TweetId: {TweetId} by UserId: {UserId}", id, request.UserId);
+
+                    var tweet = tweets.FirstOrDefault(t => t.Id == id);
+
+                    if (tweet is null)
+                    {
+                        logger.Warning("Tweet with TweetId {TweetId} not found", id);
+                        return Results.NotFound();
+                    }
+
+                    logger.Information("Publishing like event for TweetId: {TweetId} by UserId: {UserId}", id, request.UserId);
+
+                    // Send message to Notification Service using RabbitMQ
+                    await bus.PubSub.PublishAsync(new TweetLikedMessage { TweetId = id, LikedByUserId = request.UserId });
+
+                    logger.Information("Like event for TweetId: {TweetId} successfully published", id);
+                    return Results.Ok();
+                });
+
+                // Map the health check endpoint
+                app.MapHealthChecks("/health");
+
+                app.Run();
+            }
+            catch (Exception ex)
             {
-                tweets.Add(tweet);
-                return Results.Ok(tweet);
-            });
-
-            // Get tweets by userId
-            app.MapGet("/tweets", (int userId) =>
+                Log.Fatal(ex, "PostManagementService terminated unexpectedly");
+            }
+            finally
             {
-                var userTweets = tweets.Where(t => t.UserId == userId).ToList();
-                return Results.Ok(userTweets);
-            });
-
-            // Like a tweet (send RabbitMQ message to Notification Service)
-            app.MapPost("/tweets/{id}/like", async (int id, LikeRequest request, IBus bus) =>
-            {
-                var tweet = tweets.FirstOrDefault(t => t.Id == id);
-
-                if (tweet is null)
-                    return Results.NotFound();
-
-                // Log message publishing
-                Console.WriteLine($"Publishing like event for Tweet {id} by user {request.UserId}");
-
-                // Send message to Notification Service using RabbitMQ
-                await bus.PubSub.PublishAsync(new TweetLikedMessage { TweetId = id, LikedByUserId = request.UserId });
-
-                return Results.Ok();
-            });
-
-            // Map the health check endpoint
-            app.MapHealthChecks("/health");
-
-            app.Run();
+                Log.CloseAndFlush();
+            }
         }
 
         public record Tweet
