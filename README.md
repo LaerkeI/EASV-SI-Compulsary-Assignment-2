@@ -94,8 +94,32 @@ http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kube
 Use the token to login.
 
 
+## Week 47 - Security
+To cover the "Security" topic of the compulsary assignment, i have implemented north-south security by making "twitter-network" internal. 
+Furthermore I have implemented east-west security to handle the security risk of microservice-to-microservice communication. 
+
+Previously a request was sent to ApiGateway with the jwt generated in AuthenticationService. 
+The ApiGateway would validate the token and route the request to the proper microservice where it would be handled. 
+
+**My implementeation of east-west security is currently not working** but the idea is: 
+- A request is sent to ApiGateway with the jwt from AuthenticationService as previously. 
+- The token is still validated in ApiGateway as previously.
+- In the receiving microservice a new jwt should be generated with authority to read/write to the endpoints in that microservice. 
+- This token should be added to the request when received by ApiGateway. This should be implemented by creating an 
+  HTTP client and configuring it with an authorization header and then adding the token as bearer token.
+- In the receiving microservice the token from the http header is validated and the request is handled. 
+
+![A image of east-west security from "Building Microservices"](docs/images/east-west-security.png)
+**Source:**  
+S.Newman, *Building Microservices: Designing Fine-Grained Systems*, 2nd ed. Sebastopol, CA, USA: O'Reilly Media, 2021.
+
+I have only tried to implement east-west security for "UserManagementService" and as it is not working, 
+I will not try to implement it any further as it will break the functionality of the microservices. 
 
 ## Week 48 - Design Patterns
 
 I have decided to implement a sidecar pattern using Fluent Bit which is a fast, lightweight, and highly scalable logging, metrics, and traces processor and forwarder. 
 Logs from multiple microservices are collected and written to separate log files within a shared directory for a easy monitoring. The logs are parsed a JSON for a structured and easy analysis. 
+
+Implementing a sidecar is a way to achieve separation of concerns as the sidecar handles non-core functionality and allows the microservice(s) to focus on core logic. 
+A sidecar can be reused by different microservices as is the case in my twitter-clone system.  

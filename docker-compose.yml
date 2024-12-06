@@ -64,6 +64,8 @@ services:
       start_period: 10s
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - ./logs/user-management-service:/var/log/app
     networks:
       - twitter-network
     restart: always
